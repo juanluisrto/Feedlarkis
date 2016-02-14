@@ -5,7 +5,6 @@ from web import form
 urls = (
   '/login', 'Login',
   '/reset', 'Reset',
-  '/hello', 'Index',
   '/signup', 'Signup'
 )
 
@@ -44,15 +43,6 @@ def create_render(privilege):
 		render = web.template.render('templates/reader/', base="layout")
 	return render
 
-signup_form = form.Form( 
-	form.Textbox("Username"),
-	form.Textbox("Email",,form.Validator('This is not a valid email', lambda x:'@' in x)),
-	form.Password('Password',form.Validator('Must be more at least 6 characters', lambda x:len(x)>5))),
-    form.Password('Repeat Password'),
-    validators = [form.Validator("Passwords didn't match.", lambda i: i.password == i.password_again)]
-    ) 
-
-
 
 class Login:
 
@@ -62,7 +52,7 @@ class Login:
 			return '%s' % render.login_double() # TODO Make the login_double template
 		else:
 			render = create_render(session.privilege)
-			return '%s' % render.login() # TODO Make the login template
+			return '%s' % render.login()
 
 	def POST(self):
 		form_info = web.input()
@@ -97,6 +87,16 @@ class Reset:
 		return 'Logged out' # TODO logout template
 
 
+###### Signup ######
+
+signup_form = form.Form( 
+	form.Textbox("Username"),
+	form.Textbox("Email",form.Validator('This is not a valid email', lambda x:'@' in x)),
+	form.Password('Password',form.Validator('Must be more at least 6 characters', lambda x:len(x)>5)),
+    form.Password('Password_again',description="Repat Password"),
+    validators = [form.Validator("Passwords didn't match.", lambda i: i.Password == i.Password_again)]
+    ) 
+
 class Signup: 
     def GET(self): 
         form0 = signup_form()
@@ -111,18 +111,9 @@ class Signup:
         if not form0.validates(): 
             return render.signup(form0)
         else:
-            # form.d.boe and form['boe'].value are equivalent ways of
+            # form.d.foe and form['foe'].value are equivalent ways of
             # extracting the validated arguments from the form.
-            return "Grrreat success! Username: %s, Password: %s" % (form0.['Username'], form0['Password'].value)
-
-class Index(object):
-	def GET(self):
-		return render.hello_form()
-
-	def POST(self):
-		form = web.input(name="Nobody", greet="Hello")
-		greeting = "%s, %s" % (form.greet, form.name)
-		return render.index(greeting = greeting)
+            return "Grrreat success! Username: %s, Password: %s" % (form0['Username'].value, form0['Password'].value)
 
 if __name__ == "__main__":
 	app.run()

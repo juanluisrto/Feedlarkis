@@ -15,4 +15,4 @@ http://learnpythonthehardway.org/book
 TODO LIST
 __________
 
-*
+* TODO Make the login_double template

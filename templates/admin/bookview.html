@@ -1,0 +1,27 @@
+$def with (days)
+
+
+<form name="main" method="post">
+    $for d in days:
+        $for meal in ['Breakfast', 'Lunch', 'Dinner']:
+            <table>
+                <tr>
+                    <th>
+                        <label for="$d">$d $meal</label>
+                    </th>
+                    <td>
+                        <select id="$d $meal" name="$d $meal">
+                            <option value="Home">Home</option>
+                            <option value="Box">Box</option>
+                            <option value="Sandwitch">Sandwitch</option>
+                            <option value="NO">NO</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type='text' name="$d $meal extra"> </input>
+                    </td>   
+                </tr>
+            </table>
+<input type="submit" />
+</form>

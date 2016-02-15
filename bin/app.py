@@ -5,7 +5,8 @@ from web import form
 urls = (
   '/login', 'Login',
   '/reset', 'Reset',
-  '/signup', 'Signup'
+  '/signup', 'Signup',
+  '/book', 'Bookings'
 )
 
 web.config.debug = False
@@ -49,10 +50,10 @@ class Login:
 	def GET(self):
 		if logged():
 			render = create_render(session.privilege)
-			return '%s' % render.login_double() # TODO Make the login_double template
+			return '%s' % render.login_double()
 		else:
 			render = create_render(session.privilege)
-			return '%s' % render.login()
+			return '%s' % render.login(message=False)
 
 	def POST(self):
 		form_info = web.input()
@@ -93,27 +94,53 @@ signup_form = form.Form(
 	form.Textbox("Username"),
 	form.Textbox("Email",form.Validator('This is not a valid email', lambda x:'@' in x)),
 	form.Password('Password',form.Validator('Must be more at least 6 characters', lambda x:len(x)>5)),
-    form.Password('Password_again',description="Repat Password"),
-    validators = [form.Validator("Passwords didn't match.", lambda i: i.Password == i.Password_again)]
-    ) 
+	form.Password('Password_again',description="Repat Password"),
+	validators = [form.Validator("Passwords didn't match.", lambda i: i.Password == i.Password_again)]
+	) 
 
-class Signup: 
-    def GET(self): 
-        form0 = signup_form()
-        # make sure you create a copy of the form by calling it (line above)
-        # Otherwise changes will appear globally
-        render = create_render(session.privilege)
-        return render.signup(form0)
+class Signup:
 
-    def POST(self): 
-        form0 = signup_form() 
-        render = create_render(session.privilege)
-        if not form0.validates(): 
-            return render.signup(form0)
-        else:
-            # form.d.foe and form['foe'].value are equivalent ways of
-            # extracting the validated arguments from the form.
-            return "Grrreat success! Username: %s, Password: %s" % (form0['Username'].value, form0['Password'].value)
+	def GET(self): 
+		form0 = signup_form()
+		# make sure you create a copy of the form by calling it (line above)
+		# Otherwise changes will appear globally
+		render = create_render(session.privilege)
+		return render.signup(form0)
+
+	def POST(self): 
+		#form0 = signup_form() 
+		render = create_render(session.privilege)
+		if not form0.validates(): 
+			return render.signup(form0)
+		else:
+			# form.d.foe and form['foe'].value are equivalent ways of
+			# extracting the validated arguments from the form.
+			return "Grrreat success! Username: %s, Password: %s" % (form0['Username'].value, form0['Password'].value)
+			#TODO Add the new user info to the database
+
+
+###### Booking system ######
+
+days = ['10th November','11th November','12th November']
+
+
+class Bookings:
+
+	def GET(self):
+		if logged():
+			render = create_render(session.privilege)
+			return '%s' % render.bookview(days=days)
+		else:
+			render = create_render(session.privilege)
+			return '%s' % render.login(message='You cannot book without being logged in!!!')
+
+	def POST(self):
+		#form0 = booking_form()
+		#render = create_render(session.privilege)
+		form_info = web.input()
+		return str( form_info )
+
+
 
 if __name__ == "__main__":
 	app.run()

@@ -1,8 +1,8 @@
-$def with (form)
+$def with (form0)
 
 <form name="main" method="post"> 
-$if not form.valid:
+$if not form0.valid:
 	<p class="error">Try again:</p>
-$:form.render()
+$:form0.render()
 <input type="submit" />
 </form>

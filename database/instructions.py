@@ -7,7 +7,7 @@ c = conn.cursor()
 c.execute('''CREATE TABLE users_database
 (
   user text,
-  pass text,
+  password text,
   email text,
   privilege integer NOT NULL DEFAULT 0)
 ''')

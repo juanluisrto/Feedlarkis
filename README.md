@@ -29,9 +29,6 @@ BIG ISSUES:
 * Prepare the database to store calendar-like info
 
 SMALL ISSUES:
-* Make sure that admin, user and reader have the appropriate
-* Make sure that wrong get request get cathced and do not throw errors when you ask them with wrong priviledges
-* Add the new user info to the database at signup
 # Add the new booking info to the database
 * Radio buttons should submit itsel automatically as soon as it is selected
 

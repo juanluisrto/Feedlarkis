@@ -61,11 +61,11 @@ class Login:
 
 		try:
 			storage = db.select('users_database', where='user=$u_name', vars=locals())[0]
-			if u_passwd == storage['pass']:
-					session.login = 1
-					session.privilege = storage['privilege']
-					render = create_render(session.privilege)
-					return render.login_ok() # TODO Make the login_ok template
+			if u_passwd == storage['password']:
+				session.login = 1
+				session.privilege = storage['privilege']
+				render = create_render(session.privilege)
+				return render.login_ok() # TODO Make the login_ok template
 			else:
 				session.login = 0
 				session.privilege = -1
@@ -108,13 +108,19 @@ class Signup:
 		return render.signup(form0)
 
 	def POST(self): 
-		#form0 = signup_form() 
+		form0 = signup_form() 
 		render = create_render(session.privilege)
 		if not form0.validates(): 
 			return render.signup(form0)
 		else:
 			# form.d.foe and form['foe'].value are equivalent ways of
 			# extracting the validated arguments from the form.
+			dictinput = web.input()
+			user0 = dictinput['Username']
+			pass0 = dictinput['Password']
+			email0 = dictinput['Email']
+			sequence_id = db.insert('users_database',user="$name0", password="$pass0", email="$email0", privilege=0 )
+
 			return "Grrreat success! Username: %s, Password: %s" % (form0['Username'].value, form0['Password'].value)
 			#TODO Add the new user info to the database
 

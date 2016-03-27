@@ -1,12 +1,19 @@
 import web
 import hashlib
 from web import form
+import smtplib
+import string
+import random
+
+BASE_URL = 'www.feedlarkis.org'
 
 urls = (
+  '/', 'Welcome',
   '/login', 'Login',
   '/reset', 'Reset',
   '/signup', 'Signup',
-  '/book', 'Bookings'
+  '/book', 'Bookings',
+  '/approval/(.*)', 'Approve'
 )
 
 web.config.debug = False
@@ -45,15 +52,48 @@ def create_render(privilege):
 	return render
 
 
+def send_email(user, pwd, recipient, subject, body):
+
+    gmail_user = user
+    gmail_pwd = pwd
+    FROM = user
+    TO = recipient if type(recipient) is list else [recipient]
+    SUBJECT = subject
+    TEXT = body
+
+    # Prepare actual message
+    message = """\From: %s\nTo: %s\nSubject: %s\n\n%s
+    """ % (FROM, ", ".join(TO), SUBJECT, TEXT)
+    try:
+        server = smtplib.SMTP("smtp.gmail.com", 587)
+        server.ehlo()
+        server.starttls()
+        server.login(gmail_user, gmail_pwd)
+        server.sendmail(FROM, TO, message)
+        server.close()
+        print 'successfully sent the mail'
+    except:
+        print "failed to send mail"
+
+class Welcome:
+
+	def GET(self):
+		if logged():
+			render = create_render(session.privilege)
+			return '%s' % render.welcome_screen()
+		else:
+			render = create_render(session.privilege)
+			return '%s' % render.welcome_screen()
+
 class Login:
 
 	def GET(self):
 		if logged():
 			render = create_render(session.privilege)
-			return '%s' % render.login_double()
+			return '%s' % render.login(failed = False, state='double')
 		else:
 			render = create_render(session.privilege)
-			return '%s' % render.login(message=False)
+			return '%s' % render.login(failed = False, state='first_try')
 
 	def POST(self):
 		form_info = web.input()
@@ -61,22 +101,27 @@ class Login:
 
 		try:
 			storage = db.select('users_database', where='user=$u_name', vars=locals())[0]
-			if u_passwd == storage['password']:
+			if u_passwd == storage['password'] and storage['authorized']:
 				session.login = 1
 				session.privilege = storage['privilege']
 				render = create_render(session.privilege)
-				return render.login_ok() # TODO Make the login_ok template
+				return render.login(failed=False, state='login_ok')
+			elif u_passwd == storage['password'] and not storage['authorized']:
+				session.login = 0
+				session.privilege = -1
+				render = create_render(session.privilege)
+				return render.login(failed=True, state='wait_approval') # TODO Make the login_waitforapproval template
 			else:
 				session.login = 0
 				session.privilege = -1
 				render = create_render(session.privilege)
-				return render.login_error(user_exists=True) # TODO Make the login_ok template
+				return render.login(failed=True, state='user_exists')
 			
 		except:
 			session.login = 0
 			session.privilege = -1
 			render = create_render(session.privilege)
-			return render.login_error(user_exists=False)
+			return render.login(failed=True, state='user_not_found')
 		
 
 class Reset:
@@ -85,7 +130,7 @@ class Reset:
 		session.login = 0
 		session.kill()
 		render = create_render(session.privilege)
-		return 'Logged out' # TODO logout template
+		return render.logout()
 
 
 ###### Signup ######
@@ -119,9 +164,25 @@ class Signup:
 			user0 = dictinput['Username']
 			pass0 = dictinput['Password']
 			email0 = dictinput['Email']
-			sequence_id = db.insert('users_database',user="$name0", password="$pass0", email="$email0", privilege=0 )
+			approval0 = ''.join( [ random.choice( string.letters ) for _ in xrange(10) ] )
 
-			return "Grrreat success! Username: %s, Password: %s" % (form0['Username'].value, form0['Password'].value)
+			sequence_id = db.insert('users_database', user="$name0", password="$pass0",\
+				email="$email0", privilege=0, approvalcode="$approval0",authorized=0 )
+
+			send_email('feedlarkis@gmail.com', '1234feedme', recipient=email0, subject='%s has signed up to feedlarkis',\
+				body='''Dear Admin,
+				A new user is trying to get access to feedlarkis with the following credentials:
+
+				Username:  %s
+				Email:  %s
+
+				Follow this link to give him approval:
+
+				%s
+
+				''' % (user0, email0, BASE_URL+'/approval/'+approval0))
+
+			return "Grrreat success! Username: %s, Password: %s\nNow please wait for approval" % (form0['Username'].value, form0['Password'].value)
 			#TODO Add the new user info to the database
 
 
@@ -145,6 +206,13 @@ class Bookings:
 		#render = create_render(session.privilege)
 		form_info = web.input()
 		return str( form_info )
+
+
+class Approve:
+
+	def GET(self, approval_id):
+		q = db.update('users_database', where='approvalcode = $approval_id', authorized=1, vars=locals())
+		return name
 
 
 

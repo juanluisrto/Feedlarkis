@@ -194,7 +194,7 @@ days = ['10th November','11th November','12th November']
 
 
 def allowed_bookings():
-
+	pass
 
 
 class Bookings:

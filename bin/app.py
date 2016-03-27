@@ -168,11 +168,12 @@ class Signup:
 			email0 = dictinput['Email']
 			approval0 = ''.join( [ random.choice( string.letters ) for _ in xrange(10) ] )
 
-			sequence_id = db.insert('USERS_DATA', USER="$name0", PASSWORD="$pass0",\
-				EMAIL="$email0", PRIVILEGE=0, AUTHORIZED=0, APPROVALCODE="$approval0" )
+			sequence_id = db.insert('USERS_DATA', USER=name0, PASSWORD=pass0,\
+				EMAIL=email0, PRIVILEGE=0, AUTHORIZED=0, APPROVALCODE=approval0 )
 
 			send_email('feedlarkis@gmail.com', '1234feedme', recipient="gioelelamanno@gmail.com", subject='%s has signed up to feedlarkis',\
-				body='''Dear Admin,
+				body='''
+				Dear Admin,
 				A new user is trying to get access to feedlarkis with the following credentials:
 
 				Username:  %s
@@ -217,8 +218,8 @@ class Bookings:
 class Approve:
 
 	def GET(self, approval_id):
-		q = db.update('users_database', where='approvalcode = $approval_id', authorized=1, vars=locals())
-		return name
+		q = db.update('USERS_DATA', where='APPROVALCODE = $approval_id', AUTHORIZED=1, vars=locals())
+		return '<div>Approved!s</div>'
 
 
 

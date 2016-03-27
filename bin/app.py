@@ -141,7 +141,7 @@ signup_form = form.Form(
 	form.Textbox("Username"),
 	form.Textbox("Email",form.Validator('This is not a valid email', lambda x:'@' in x)),
 	form.Password('Password',form.Validator('Must be more at least 6 characters', lambda x:len(x)>5)),
-	form.Password('Password_again',description="Repat Password"),
+	form.Password('Password_again',description="Repeat Password"),
 	validators = [form.Validator("Passwords didn't match.", lambda i: i.Password == i.Password_again)]
 	) 
 
@@ -171,7 +171,7 @@ class Signup:
 			sequence_id = db.insert('USERS_DATA', USER="$name0", PASSWORD="$pass0",\
 				EMAIL="$email0", PRIVILEGE=0, APPROVALCODE="$approval0",AUTHORIZED=0 )
 
-			send_email('feedlarkis@gmail.com', '1234feedme', recipient=email0, subject='%s has signed up to feedlarkis',\
+			send_email('feedlarkis@gmail.com', '1234feedme', recipient="gioelelamanno@gmail.com", subject='%s has signed up to feedlarkis',\
 				body='''Dear Admin,
 				A new user is trying to get access to feedlarkis with the following credentials:
 

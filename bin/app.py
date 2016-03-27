@@ -169,7 +169,7 @@ class Signup:
 			approval0 = ''.join( [ random.choice( string.letters ) for _ in xrange(10) ] )
 
 			sequence_id = db.insert('USERS_DATA', USER="$name0", PASSWORD="$pass0",\
-				EMAIL="$email0", PRIVILEGE=0, APPROVALCODE="$approval0",AUTHORIZED=0 )
+				EMAIL="$email0", PRIVILEGE=0, AUTHORIZED=0, APPROVALCODE="$approval0" )
 
 			send_email('feedlarkis@gmail.com', '1234feedme', recipient="gioelelamanno@gmail.com", subject='%s has signed up to feedlarkis',\
 				body='''Dear Admin,

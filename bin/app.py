@@ -4,6 +4,7 @@ from web import form
 import smtplib
 import string
 import random
+import datetime
 
 BASE_URL = 'www.feedlarkis.org'
 
@@ -14,6 +15,7 @@ urls = (
   '/signup', 'Signup',
   '/book', 'Bookings',
   '/approval/(.*)', 'Approve'
+  '/manage/mealtimes', 'Manage_Mealtimes'
 )
 
 web.config.debug = False
@@ -100,7 +102,7 @@ class Login:
 		u_name, u_passwd = form_info.user, form_info.passwd
 
 		try:
-			storage = db.select('users_database', where='user=$u_name', vars=locals())[0]
+			storage = db.select('USERS_DATA', where='USER=$u_name', vars=locals())[0]
 			if u_passwd == storage['password'] and storage['authorized']:
 				session.login = 1
 				session.privilege = storage['privilege']
@@ -166,8 +168,8 @@ class Signup:
 			email0 = dictinput['Email']
 			approval0 = ''.join( [ random.choice( string.letters ) for _ in xrange(10) ] )
 
-			sequence_id = db.insert('users_database', user="$name0", password="$pass0",\
-				email="$email0", privilege=0, approvalcode="$approval0",authorized=0 )
+			sequence_id = db.insert('USERS_DATA', USER="$name0", PASSWORD="$pass0",\
+				EMAIL="$email0", PRIVILEGE=0, APPROVALCODE="$approval0",AUTHORIZED=0 )
 
 			send_email('feedlarkis@gmail.com', '1234feedme', recipient=email0, subject='%s has signed up to feedlarkis',\
 				body='''Dear Admin,
@@ -189,6 +191,10 @@ class Signup:
 ###### Booking system ######
 
 days = ['10th November','11th November','12th November']
+
+
+def allowed_bookings():
+
 
 
 class Bookings:
@@ -215,6 +221,9 @@ class Approve:
 		return name
 
 
+
+class Manage_Mealtimes:
+	pass
 
 if __name__ == "__main__":
 	app.run()

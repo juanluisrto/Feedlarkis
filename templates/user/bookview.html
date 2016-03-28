@@ -1,1 +1,24 @@
-Nothing yet!
+$def with (allowed_bookings)
+
+
+<form name="main" method="post">
+    $for day, Breakfast, Lunch, Dinner in allowed_bookings:
+        $for name, meal in zip( ['Breakfast', 'Breakfast', 'Dinner'], [Breakfast, Lunch, Dinner] ):
+            <table>
+                <tr>
+                    <th>
+                        <label for="$day">$day $name</label>
+                    </th>
+                    <td>
+                        <select id="$day $name" name="$day $name">
+                            $for kind in meal:
+                                <option value="$kind">$kind</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type='text' name="$day $name extra"> </input>
+                    </td>   
+                </tr>
+            </table>
+<input type="submit" />
+</form>

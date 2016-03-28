@@ -26,7 +26,7 @@ db = web.database(dbn='sqlite', db='larkstadens.db')
 
 store = web.session.DiskStore('sessions')
 
-session = web.session.Session(app, store, initializer={'login': 0, 'privilege': 0})
+session = web.session.Session(app, store, initializer={'login': 0, 'privilege': 0, 'user':'XXXXX'})
 
 def logged():
 	if session.login==1:
@@ -44,13 +44,13 @@ def create_render(privilege):
 	'''
 	if logged():
 		if privilege == 0:
-			render = web.template.render('templates/user/', base="layout") # TODO make layout
+			render = web.template.render('templates/user/', base="layout", globals={ 'zip': zip, 'enumerate':enumerate }) # TODO make layout
 		elif privilege == 1:
-			render = web.template.render('templates/admin/', base="layout")
+			render = web.template.render('templates/admin/', base="layout", globals={ 'zip': zip, 'enumerate':enumerate })
 		else:
-			render = web.template.render('templates/reader/', base="layout")
+			render = web.template.render('templates/reader/', base="layout", globals={ 'zip': zip, 'enumerate':enumerate })
 	else:
-		render = web.template.render('templates/reader/', base="layout")
+		render = web.template.render('templates/reader/', base="layout", globals={ 'zip': zip, 'enumerate':enumerate })
 	return render
 
 
@@ -103,12 +103,14 @@ class Login:
 
 		try:
 			storage = db.select('USERS_DATA', where='USER=$u_name', vars=locals())[0]
-			if u_passwd == storage['password'] and storage['authorized']:
+			print storage['PASSWORD'],storage['AUTHORIZED']
+			if u_passwd == storage['PASSWORD'] and storage['AUTHORIZED']:
 				session.login = 1
-				session.privilege = storage['privilege']
+				session.privilege = storage['PRIVILEGE']
+				session.user = u_name
 				render = create_render(session.privilege)
 				return render.login(failed=False, state='login_ok')
-			elif u_passwd == storage['password'] and not storage['authorized']:
+			elif u_passwd == storage['PASSWORD'] and not storage['AUTHORIZED']:
 				session.login = 0
 				session.privilege = -1
 				render = create_render(session.privilege)
@@ -191,11 +193,40 @@ class Signup:
 
 ###### Booking system ######
 
-days = ['10th November','11th November','12th November']
-
-
 def allowed_bookings():
-	pass
+    days = list( db.query('''SELECT DAY FROM MEALTIMES 
+    WHERE DATE(DAY) < DATE('now','+7 days') AND DATE('now') < DATE(DAY)'''))
+
+    breakfast = list( db.query('''SELECT DAY, BREAKFAST_START FROM MEALTIMES 
+    WHERE DATE('now') < DATE(BREAKFAST_START, 'start of day','-1 days','+9 hours','+30 minutes') AND DATE(DAY) < DATE('now','+7 days')''') )
+
+    normal_lunch = list( db.query('''SELECT DAY, LUNCH FROM MEALTIMES 
+    WHERE DATE('now') < DATE(LUNCH, 'start of day','+9 hours','+30 minutes') AND DATE(DAY) < DATE('now','+7 days')''') )
+
+    box_lunch = list( db.query('''SELECT DAY, LUNCH FROM MEALTIMES 
+    WHERE DATE('now') < DATE(LUNCH, 'start of day','-1 days','+9 hours','+30 minutes') AND DATE(DAY) < DATE('now','+7 days')''') )
+
+    dinner = list( db.query('''SELECT DAY, DINNER FROM MEALTIMES 
+    WHERE DATE('now') < DATE(DINNER, 'start of day','+9 hours','+30 minutes') AND DATE(DAY) < DATE('now','+7 days')''') )
+
+    list_outputs = []
+    for day in map(lambda x: x['DAY'], days):
+        Bre = []
+        Lun = []
+        Din = []
+        if day in map(lambda x: x['DAY'], breakfast):
+            Bre += ['-','X','T']
+        if day in map(lambda x: x['DAY'], normal_lunch):
+            Lun += ['-','X']
+        if day in map(lambda x: x['DAY'], box_lunch):
+            Lun += ['M','L']
+        if day in map(lambda x: x['DAY'], dinner):
+            Din += ['-','X', 'S']
+
+        prettyname = datetime.datetime.strptime(day, '%Y-%m-%d').strftime('%A - %d %B %Y')
+        list_outputs.append([day, prettyname, Bre, Lun, Din])
+
+    return list_outputs
 
 
 class Bookings:
@@ -203,16 +234,33 @@ class Bookings:
 	def GET(self):
 		if logged():
 			render = create_render(session.privilege)
-			return '%s' % render.bookview(days=days)
+			return '%s' % render.bookview(allowed_bookings=allowed_bookings())
 		else:
 			render = create_render(session.privilege)
-			return '%s' % render.login(message='You cannot book without being logged in!!!')
+			return '%s' % render.login(failed = False, state='booking_attempt')
 
 	def POST(self):
 		#form0 = booking_form()
 		#render = create_render(session.privilege)
 		form_info = web.input()
-		return str( form_info )
+
+		messages_dict = {}
+		for k,v in form_info.iteritems():
+			parsed_k = k.split(' ')
+			if len(parsed_k) == 3:
+				messages_dict[ ' '.join(parsed_k[:-1]) ] = v
+
+		for k,v in form_info.iteritems():
+			parsed_k = k.split(' ')
+			if len(parsed_k) == 2:
+				if v != u'':
+					sequence_id = db.insert('BOOKINGS', USER=session.user,
+						SUBMISSION_TIME=datetime.datetime.today().strftime('%Y-%m-%d %H:%M'),\
+						BOOKING_DAY=parsed_k[0],
+						MEAL=parsed_k[1],
+						TYPE=v,
+						MESSAGE=messages_dict[k] )
+		return 'Done'
 
 
 class Approve:
@@ -220,7 +268,6 @@ class Approve:
 	def GET(self, approval_id):
 		q = db.update('USERS_DATA', where='APPROVALCODE = $approval_id', AUTHORIZED=1, vars=locals())
 		return '<div>Approved!s</div>'
-
 
 
 class Manage_Mealtimes:

@@ -48,21 +48,21 @@ c.execute('''CREATE TABLE MEALTIMES(
 ''')
 
 def default_meals(dateobj):
-    day = dateobj.strftime('%A - %d %B %Y')
+    day = dateobj.strftime('%Y-%m-%d') #YYYY-MM-DD #HH:MM
     if dateobj.strftime('%A') in ['Saturday','Sunday']:
-        breakfast_start = '7:45'
-        breakfast_end = '10:15'
-        lunch = '13:00'
-        fika_start = '16:00'
-        fika_end = '18:00'
-        dinner = '19:30'
+        breakfast_start = day + ' 07:45'
+        breakfast_end = day + ' 10:15'
+        lunch = day + ' 13:00'
+        fika_start = day + ' 16:00'
+        fika_end = day + ' 18:00'
+        dinner = day + ' 19:30'
     else:
-        breakfast_start = '6:45'
-        breakfast_end = '9:30'
-        lunch = '12:15'
-        fika_start = '15:30'
-        fika_end = '18:00'
-        dinner = '19:30'
+        breakfast_start = day +' 06:45'
+        breakfast_end = day +' 09:30'
+        lunch = day +' 12:15'
+        fika_start = day +' 15:30'
+        fika_end = day +' 18:00'
+        dinner = day +' 19:30'
         
     return day, breakfast_start, breakfast_end, lunch, fika_start, fika_end, dinner
 

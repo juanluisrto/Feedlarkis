@@ -1,25 +1,22 @@
-$def with (days)
+$def with (allowed_bookings)
 
 
 <form name="main" method="post">
-    $for d in days:
-        $for meal in ['Breakfast', 'Lunch', 'Dinner']:
+    $for day, prettyname, Breakfast, Lunch, Dinner in allowed_bookings:
+        $for name, meal in zip( ['Breakfast', 'Lunch', 'Dinner'], [Breakfast, Lunch, Dinner] ):
             <table>
                 <tr>
                     <th>
-                        <label for="$d">$d $meal</label>
+                        <label for="$day">$prettyname $name</label>
                     </th>
                     <td>
-                        <select id="$d $meal" name="$d $meal">
-                            <option value="Home">Home</option>
-                            <option value="Box">Box</option>
-                            <option value="Sandwitch">Sandwitch</option>
-                            <option value="NO">NO</option>
-                            <option value="Other">Other</option>
+                        <select id="$day $name" name="$day $name">
+                            $for kind in meal:
+                                <option value="$kind">$kind</option>
                         </select>
                     </td>
                     <td>
-                        <input type='text' name="$d $meal extra"> </input>
+                        <input type='text' name="$day $name extra"> </input>
                     </td>   
                 </tr>
             </table>

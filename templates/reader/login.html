@@ -28,22 +28,27 @@ $elif state == 'double':
         If you want to log out click <a href="/reset">here</a>
     </div>
 $else:
-    <div>
+    <div class="container">
         <form action="/login" method="POST">
-            <table id="login">
-                <tr>
-                    <td>User: </td>
-                    <td><input type="text" name="user"></td>
-                </tr>
-                <tr>
-                    <td>Password: </td>
-                    <td><input type="password" name="passwd"></td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td><input type="submit" value="LOGIN"></td>
-                </tr>
-            </table>
+        <div class="top">
+            <h1 id="title" class="hidden"><span id="logo">Larkstaden's <span>Meal list</span></span></h1>
+        </div>
+        <div class="login-box animated fadeInUp">
+            <div class="box-header">
+                <h2>Log In</h2>
+            </div>
+            <label for="username">Username</label>
+            <br/>
+            <input type="text" id="username" name="user">
+            <br/>
+            <label for="password">Password</label>
+            <br/>
+            <input type="password" id="password" name="passwd">
+            <br/>
+            <button type="submit" value="LOGIN" >Log in</button>
+            <br/>
+            <a href="#"><p class="small">Forgot your password?</p></a>
+        </div>
         </form>
     </div>
 

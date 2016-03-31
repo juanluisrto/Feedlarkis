@@ -3,11 +3,42 @@ $def with (content)
 <html>
 
 <head>
+
+    <meta charset="utf-8">
     <title>Feed Larkis - Your semiautomatic meal booking system</title>
+    <link rel="stylesheet" type="text/css" href="reader.css">
+     <!-- Google Fonts -->
+	<link href='https://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700|Lato:400,100,300,700,900' rel='stylesheet' type='text/css'>
+
+	<link rel="stylesheet" href="/static/animate.css">
+	<!-- Custom Stylesheet -->
+	<link rel="stylesheet" href="/static/style.css">
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 </head>
 <body>
 
 $:content
 
 </body>
+<script>
+    jQuery(document).ready(function () {
+         jQuery('#logo').addClass('animated fadeInDown');
+         jQuery("input:text:visible:first").focus();
+    });
+     jQuery('#username').focus(function() {
+         jQuery('label[for="username"]').addClass('selected');
+    });
+     jQuery('#username').blur(function() {
+         jQuery('label[for="username"]').removeClass('selected');
+    });
+     jQuery('#password').focus(function() {
+         jQuery('label[for="password"]').addClass('selected');
+    });
+     jQuery('#password').blur(function() {
+         jQuery('label[for="password"]').removeClass('selected');
+    });
+  </script>
+
+
 </html>

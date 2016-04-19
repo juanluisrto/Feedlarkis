@@ -1,0 +1,11 @@
+Things that can possibly be added
+-A instructions.html page from the menu which just explains everything
+-A configuration menu which would let:
+	-choose language:english/swedish
+	-choose notification emails etc
+-Reminding someone to go select lunches when there is nothing selected x time before (1 day for example)
+-I would place the machine estimations in another color, so that the resident knows that he didn't write anything himself.
+-I would keep the residents meal history in case it is useful in the future. As well for statistics, etc
+-I would implement a password recovery mechanism.
+
+//Of course many other things apart from these have to be implemented before. This is just a bunch of ideas.

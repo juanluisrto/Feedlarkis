@@ -1,0 +1,56 @@
+<div class="col-sm-3">
+	<div class="panel panel-primary">
+		<div class="panel-heading">%s</div>
+		<div class="panel-body">
+			<div class= "day">
+				<form>
+					Breakfast
+					<select name="breakfast">
+						<option value="normal">Normal</option>
+						<option value="early">Early</option>
+					</select>
+					<br>
+					Lunch
+					<select name="lunch">
+						<option value="normal">Normal</option>
+						<option value="lunchbox">lunchbox</option>
+						<option value="sandwiches">sandwiches</option>
+					</select>
+					<br>
+					Dinner
+					<select name="lunch">
+						<option value="normal">Normal</option>
+						<option value="late_dinner">Late dinner</option>
+						<option value="lunchbox">lunchbox</option>
+						<option value="sandwiches">sandwiches</option>
+					</select>
+					<br>
+				</form>
+			</div>
+		</div>
+		<div class="panel-footer">Buy 50 mobiles and get a gift card</div>
+	</div>
+</div>
+
+
+#enables popovers
+<script>
+$(document).ready(function(){
+    $('[data-toggle="popover"]').popover(); 
+});
+</script>
+
+
+<a href="#" title="Header" data-toggle="popover" data-placement="bottom" data-content="Content">Click</a>
+
+
+ <button class="btn">Comment</button>
+</div>
+
+<script>
+$(document).ready(function(){
+    $('.btn').popover({title: "<strong>Comment:</strong>", content: "<input type="text" name="comment">", html: true, placement: "bottom"}); 
+});
+</script>
+
+<input type="text" name="firstname">
